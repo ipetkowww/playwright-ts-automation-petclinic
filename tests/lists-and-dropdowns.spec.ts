@@ -30,7 +30,6 @@ test('TC2: Validate the pet type update', async ({page}) => {
     await page.getByRole('link', {name: 'Eduardo Rodriquez'}).click();
     const rosyPetSection: Locator = page.locator('app-pet-list', { hasText: 'Rosy' });
 
-
     await rosyPetSection.getByRole('button', {name: 'Edit Pet'}).click();
     await expect(page.locator('input#name')).toHaveValue('Rosy');
 
