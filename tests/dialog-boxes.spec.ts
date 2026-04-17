@@ -24,5 +24,6 @@ test('TC1: Add and delete pet type', async ({page}) => {
     })
     await lastRowInPetTypesTable.getByRole('button', {name: 'Delete'}).click();
 
+    await page.waitForResponse('**/pettypes/*');
     await expect(lastRowInPetTypesTable.getByRole('textbox')).not.toHaveValue('pig');
 })
