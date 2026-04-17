@@ -14,9 +14,9 @@ test('TC1: Validate selected specialities', async ({page}) => {
     await expect(selectedSpecialtiesDropDown).toHaveText('radiology');
     await selectedSpecialtiesDropDown.click();
 
-    const radiologyCheckbox: Locator = page.locator('#radiology');
-    const surgeryCheckbox: Locator = page.locator('#surgery');
-    const dentistryCheckbox: Locator = page.locator('#dentistry');
+    const radiologyCheckbox: Locator = page.getByRole('checkbox', {name: 'radiology'});
+    const surgeryCheckbox: Locator = page.getByRole('checkbox', {name: 'surgery'});
+    const dentistryCheckbox: Locator = page.getByRole('checkbox', {name: 'dentistry'});
     await expect(radiologyCheckbox).toBeChecked();
     await expect(surgeryCheckbox).not.toBeChecked();
     await expect(dentistryCheckbox).not.toBeChecked();
