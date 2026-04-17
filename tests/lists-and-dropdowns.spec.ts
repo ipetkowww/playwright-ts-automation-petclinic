@@ -10,7 +10,7 @@ test.beforeEach(async ({page}) => {
 })
 
 test('TC1: Validate selected pet types from the list', async ({page}) => {
-    await page.getByRole('row', {name: 'George Franklin'}).locator('.ownerFullName > a').click();
+    await page.getByRole('link', {name: 'George Franklin'}).click();
     await expect(page.locator('.ownerFullName')).toHaveText('George Franklin');
 
     await page.locator('app-pet-list', {hasText: 'Leo'}).getByRole('button', {name: 'Edit Pet'}).click();
@@ -27,8 +27,11 @@ test('TC1: Validate selected pet types from the list', async ({page}) => {
 })
 
 test('TC2: Validate the pet type update', async ({page}) => {
-    await page.getByRole('row', {name: 'Eduardo Rodriquez'}).locator('.ownerFullName > a').click();
-    await page.locator('app-pet-list', {hasText: 'Rosy'}).getByRole('button', {name: 'Edit Pet'}).click();
+    await page.getByRole('link', {name: 'Eduardo Rodriquez'}).click();
+    const rosyPetSection: Locator = page.locator('app-pet-list', { hasText: 'Rosy' });
+
+
+    await rosyPetSection.getByRole('button', {name: 'Edit Pet'}).click();
     await expect(page.locator('input#name')).toHaveValue('Rosy');
 
     const petTypeField: Locator = page.locator("#type1");
@@ -39,10 +42,9 @@ test('TC2: Validate the pet type update', async ({page}) => {
     await expect(petTypeField).toHaveValue('bird');
     await page.getByRole('button', {name: 'Update Pet'}).click();
 
-    await expect(page.locator('app-pet-list', {hasText: 'Rosy'})
-        .locator('dt:has-text("Type") + dd')).toHaveText('bird');
+    await expect(rosyPetSection.locator('dt:has-text("Type") + dd')).toHaveText('bird');
 
-    await page.locator('app-pet-list', {hasText: 'Rosy'}).getByRole('button', {name: 'Edit Pet'}).click();
+    await rosyPetSection.getByRole('button', {name: 'Edit Pet'}).click();
     await expect(page.locator('input#name')).toHaveValue('Rosy');
     await expect(petTypeField).toHaveValue('bird');
     await petTypeDropdown.selectOption('cat')
