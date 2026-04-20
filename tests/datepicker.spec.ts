@@ -69,9 +69,9 @@ test('TC2: Select the dates of visits and validate dates order', async ({page}) 
     await calendarIcon.click();
     await page.getByText(today.getDate().toString(), {exact: true}).click();
 
-    let expectedYear: number = today.getFullYear()
-    let expectedMonth: string = String(today.getMonth() + 1).padStart(2, '0');
-    let expectedDay: string = String(today.getDate()).padStart(2, '0');
+    const expectedYear: number = today.getFullYear()
+    const expectedMonth: string = String(today.getMonth() + 1).padStart(2, '0');
+    const expectedDay: string = String(today.getDate()).padStart(2, '0');
     await expect(page.locator('.mat-datepicker-input')).toHaveValue(`${expectedYear}/${expectedMonth}/${expectedDay}`);
 
     await descriptionField.fill('dermatologists visit');
@@ -79,7 +79,7 @@ test('TC2: Select the dates of visits and validate dates order', async ({page}) 
     await page.waitForResponse(response => response.url().includes('/api/owners/'));
 
     const samanthaVisits: Locator = samanthaSection.locator('app-visit-list table > tr');
-    let samanthaLatestVisit: Locator = samanthaVisits.first().locator('td').first();
+    const samanthaLatestVisit: Locator = samanthaVisits.first().locator('td').first();
 
     expect(await samanthaLatestVisit.textContent()).toEqual(`${expectedYear}-${expectedMonth}-${expectedDay}`);
 
@@ -100,7 +100,7 @@ test('TC2: Select the dates of visits and validate dates order', async ({page}) 
     await addVisitButton.click();
     await page.waitForResponse(response => response.url().includes('/api/owners/'));
 
-    let dateOfLastAddedVisit = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const dateOfLastAddedVisit = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     const latestVisit: Date = new Date(await samanthaLatestVisit.textContent());
     const lastAddedVisit: Date = new Date(dateOfLastAddedVisit);
 
