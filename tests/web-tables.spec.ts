@@ -113,7 +113,7 @@ test('TC6: Validate specialty update', async ({page}) => {
     await expect(page.getByRole('row', {name: 'surgery'})).toBeVisible();
 })
 
-test('TC6: Validate specialty lists', async ({page}) => {
+test('TC7: Validate specialty lists', async ({page}) => {
     await page.getByRole('link', {name: 'Specialties'}).click();
 
     await page.getByRole('button', {name: 'Add'}).click();
@@ -121,39 +121,30 @@ test('TC6: Validate specialty lists', async ({page}) => {
     await page.getByRole('button', {name: 'Save'}).click();
     await expect(page.getByRole('button', {name: 'Save'})).not.toBeVisible();
 
-
-    // 3. Extract all values of specialties and put them into the array.
-    const specialties = await Promise.all(
+    const expectedSpecialties = await Promise.all(
         (await page.getByRole('textbox').all()).map(e => e.inputValue())
     );
 
-    // 4. Select the VETERINARIANS menu item in the navigation bar, then select "All"
     await page.getByRole('button', {name: 'Veterinarians'}).click();
     await page.getByRole('link', {name: 'All'}).click();
 
-
-    // 5. On the Veterinarians page, locate the "Sharon Jenkins" in the list and click "Edit" button
     await page.getByRole('row', {name: 'Sharon Jenkins'}).getByRole('button', {name: 'Edit Vet'}).click();
-    // 6. Click on the Specialties drop-down menu. Extract all values from the drop-down menu to an array
     await page.locator('.dropdown-display').click();
 
-    let s: string[] = await Promise.all(
+    let actualSpecialties: string[] = await Promise.all(
         (await page.locator('.dropdown-content label').all()).map(e => e.textContent())
     );
 
-    // 7. Add the assertion that the array of specialties collected in step 3 is equal the the array from drop-down menu
-    expect(specialties).toEqual(s);
-    // 8. Select the "oncology" specialty and click "Save vet" button
+    expect(actualSpecialties).toEqual(expectedSpecialties);
+
     await page.getByRole('checkbox', {name: 'oncology'}).check();
     await page.locator('.dropdown-display').click();
     await page.getByRole('button', {name: 'Save Vet'}).click();
 
-    // 9. On the Veterinarians page, add assertion that "Sharon Jenkins" has a specialty "oncology"
     await expect(page.getByRole('row', {name: 'Sharon Jenkins'}).locator('td').nth(1)).toHaveText('oncology');
-    // 10. Navigate to the SPECIALTIES page. Click "Delete" for "oncology" specialty
     await page.getByRole('link', {name: 'Specialties'}).click();
     await page.getByRole('row', {name: 'oncology'}).getByRole('button', {name: 'Delete'}).click();
-    // 11. Navigate to the VETERINARIANS page. Add an assertion that "Sharon Jenkins" has no specialty assigned
+
     await page.getByRole('button', {name: 'Veterinarians'}).click();
     await page.getByRole('link', {name: 'All'}).click();
     await expect(page.getByRole('row', {name: 'Sharon Jenkins'}).locator('td').nth(1)).toBeEmpty();
