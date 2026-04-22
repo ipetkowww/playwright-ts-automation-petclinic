@@ -17,46 +17,55 @@ test.describe('Tests related to Owners page', async () => {
     })
 
     test('TC2: Validate owners count of the Madison city', async ({page}) => {
-        const targetRow: Locator = page.getByRole('row', {name: 'Madison'});
-        const expectedCountOfOwnersFromMadison: number = 4;
-
-        await expect(targetRow.first()).toBeVisible();
-        expect(await targetRow.all()).toHaveLength(expectedCountOfOwnersFromMadison);
+        const expectedOwnersCountFromMadison: number = 4;
+        await expect(page.getByRole('row', {name: 'Madison'})).toHaveCount(expectedOwnersCountFromMadison);
     })
 
     test('TC3: Validate search by Last Name', async ({page}) => {
         const table: Locator = page.getByRole('table');
         await expect(table).toBeVisible();
         const lastNameField: Locator = page.getByRole('textbox');
-        const findOwnerButton: Locator = page.getByRole('button', {name: 'Find Owner'})
+        const findOwnerButton: Locator = page.getByRole('button', {name: 'Find Owner'});
 
-        await lastNameField.fill('Black');
-        await findOwnerButton.click();
-        await page.waitForResponse(response => response.url().includes('/api/owners?lastName'))
-        const ownerLastName: string = (await table.getByRole('link').textContent()).split(' ')[1];
-        expect(ownerLastName).toEqual('Black');
+        const searchCases = [
+            {
+                lastName: 'Black',
+                assert: async () => {
+                    const ownerLastName: string = (await table.getByRole('link').textContent()).split(' ')[1];
+                    expect(ownerLastName).toEqual('Black');
+                }
+            },
+            {
+                lastName: 'Davis',
+                assert: async () => {
+                    for (const ownerName of await table.getByRole('link').allTextContents()) {
+                        expect(ownerName.split(' ')[1]).toEqual('Davis');
+                    }
+                }
+            },
+            {
+                lastName: 'Es',
+                assert: async () => {
+                    for (const ownerName of await table.getByRole('link').allTextContents()) {
+                        expect(ownerName.split(' ')[1]).toContain('Es');
+                    }
+                }
+            },
+            {
+                lastName: 'Playwright',
+                assert: async () => {
+                    await expect(page.getByText('No owners with LastName starting with "Playwright"')).toBeVisible();
+                }
+            },
+        ];
 
-        await lastNameField.fill('Davis');
-        await findOwnerButton.click();
-        await page.waitForResponse(response => response.url().includes('/api/owners?lastName'))
-        for (const ownerName of await table.getByRole('link').allTextContents()) {
-            const ownerLastName: string = ownerName.split(' ')[1];
-            expect(ownerLastName).toEqual('Davis');
+        for (const {lastName, assert} of searchCases) {
+            await lastNameField.fill(lastName);
+            await findOwnerButton.click();
+            await page.waitForResponse(response => response.url().includes('/api/owners?lastName'));
+            await assert();
         }
-
-        await lastNameField.fill('Es');
-        await findOwnerButton.click();
-        await page.waitForResponse(response => response.url().includes('/api/owners?lastName'))
-        for (const ownerName of await table.getByRole('link').allTextContents()) {
-            const ownerLastName: string = ownerName.split(' ')[1];
-            expect(ownerLastName).toContain('Es');
-        }
-
-        await lastNameField.fill('Playwright');
-        await findOwnerButton.click();
-        await page.waitForResponse(response => response.url().includes('/api/owners?lastName'))
-        await expect(page.getByText('No owners with LastName starting with "Playwright"')).toBeVisible();
-    })
+    });
 
     test('TC4: Validate phone number and pet name on the Owner Information Page', async ({page}) => {
         const targetRow: Locator = page.getByRole('row', {name: '6085552765'});
